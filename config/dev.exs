@@ -41,9 +41,14 @@ config :phoenix, :stacktrace_depth, 20
 config :feather, Feather.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: "ok",
-  password: "",
+  password: "maxx",
   database: "elixir_drip_dev",
   hostname: "127.0.0.1",
-  pool_size: 10
+  pool_size: 10,
+  types: Feather.PostgresTypes
 
 
+
+  # item = %{code: "ABCD", description: "testing code", is_active: true, type: "unique", amount: 100.50, event_location: %Geo.Point{coordinates: {87.9074701, 43.0387105}, srid: 4326}}
+
+  # Feather.PromoModel.changeset(%Feather.PromoModel{}, item) |> Feather.PromoModel.insert!()

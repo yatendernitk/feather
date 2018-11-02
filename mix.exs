@@ -5,7 +5,7 @@ defmodule Feather.Mixfile do
     [
       app: :feather,
       version: "0.0.1",
-      elixir: "~> 1.4",
+      elixir: "~> 1.7",
       elixirc_paths: elixirc_paths(Mix.env),
       compilers: [:phoenix, :gettext] ++ Mix.compilers,
       start_permanent: Mix.env == :prod,
@@ -41,7 +41,10 @@ defmodule Feather.Mixfile do
       {:plug_cowboy, "~> 1.0"},
       {:cowboy, "~> 1.0"},
       {:timex_ecto, "~> 3.0"},
-      {:timex, "~> 3.1"}
+      {:geo, "~> 3.0"},
+      {:geo_postgis, "~> 2.0"},
+      {:timex, "~> 3.1"},
+      {:poison, "~> 3.1"}
     ]
   end
 

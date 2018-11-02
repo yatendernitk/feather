@@ -14,7 +14,4 @@ defmodule Feather.PromoCode do
     :event_location,
     :radius
   ]
-
-
-
 end

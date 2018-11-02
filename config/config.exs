@@ -9,6 +9,9 @@ use Mix.Config
 config :feather,
   ecto_repos: [Feather.Repo]
 
+# config :feather, Feather.Repo,
+#   extensions: [{Geo.PostGIS.Extension, library: Geo}]
+
 # Configures the endpoint
 config :feather, FeatherWeb.Endpoint,
   url: [host: "localhost"],
