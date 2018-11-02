@@ -20,7 +20,7 @@ defmodule Feather.Mixfile do
   def application do
     [
       mod: {Feather.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :timex, :timex_ecto]
     ]
   end
 
@@ -39,7 +39,9 @@ defmodule Feather.Mixfile do
       {:postgrex, ">= 0.0.0"},
       {:gettext, "~> 0.11"},
       {:plug_cowboy, "~> 1.0"},
-      {:cowboy, "~> 1.0"}
+      {:cowboy, "~> 1.0"},
+      {:timex_ecto, "~> 3.0"},
+      {:timex, "~> 3.1"}
     ]
   end
 
