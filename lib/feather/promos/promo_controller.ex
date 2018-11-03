@@ -9,17 +9,70 @@ defmodule Feather.PromoController do
     PromoModel
   }
 
-  def index(conn, _params) do
+  def index(conn, params) do
+    {status, response} =
+      case PromoModel.get_codes(params) do
+        {:ok, resp} -> {200, resp}
+        {:error, resp} -> {400, resp}
+      end
     conn
     |> put_resp_content_type("application/json")
-    |> send_resp(200, Poison.encode!("yo"))
+    |> send_resp(status, Poison.encode!(%{resp: response}))
   end
 
-  def generate_codes(conn, params) do
-    resp = PromoModel.generate_codes(params)
+  def get_code_details(conn, params) do
+    {status, response} =
+      case PromoModel.get_code_details(params) do
+        {:ok, resp} -> {200, resp}
+        {:error, resp} -> {400, resp}
+      end
     conn
     |> put_resp_content_type("application/json")
-    |> send_resp(200, Poison.encode!(%{resp: resp}))
+    |> send_resp(status, Poison.encode!(%{resp: response}))
+  end
+
+  def create(conn, params) do
+    {status, response} =
+      case PromoModel.generate_codes(params) do
+        {:ok, resp} -> {200, resp}
+        {:error, error} -> {400, error}
+      end
+    conn
+    |> put_resp_content_type("application/json")
+    |> send_resp(status, Poison.encode!(%{resp: response}))
+  end
+
+  def validate_code(conn, params) do
+    {status, response} =
+      case PromoModel.validate_code(params) do
+        {:ok, resp} -> {200, resp}
+        {:error, error} -> {400, error}
+      end
+    conn
+    |> put_resp_content_type("application/json")
+    |> send_resp(status, Poison.encode!(%{resp: response}))
+  end
+
+  def activate_code(conn, params) do
+    {status, response} =
+      case PromoModel.activate_code(params) do
+        {:ok, resp} -> {200, resp}
+        {:error, error} -> {400, error}
+      end
+    conn
+    |> put_resp_content_type("application/json")
+    |> send_resp(status, Poison.encode!(%{resp: response}))
+  end
+
+  def deactivate_code(conn, params) do
+    {status, response} =
+      case PromoModel.deactivate_code(params) do
+        {:ok, resp} -> {200, resp}
+        {:error, error} -> {400, error}
+      end
+    conn
+    |> put_resp_content_type("application/json")
+    |> send_resp(status, Poison.encode!(%{resp: response}))
   end
 
 end
