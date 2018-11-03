@@ -17,7 +17,6 @@ defmodule Feather do
     end
   end
 
-
   def model do
     quote do
       use Ecto.Schema
@@ -27,7 +26,8 @@ defmodule Feather do
       import Ecto.Query
     end
   end
-@doc """
+
+  @doc """
   When used, dispatch to the appropriate controller/view/etc.
   """
   defmacro __using__(which) when is_atom(which) do

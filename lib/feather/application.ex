@@ -11,7 +11,7 @@ defmodule Feather.Application do
       # Start the Ecto repository
       supervisor(Feather.Repo, []),
       # Start the endpoint when the application starts
-      supervisor(FeatherWeb.Endpoint, []),
+      supervisor(FeatherWeb.Endpoint, [])
       # Start your own worker by calling: Feather.Worker.start_link(arg1, arg2, arg3)
       # worker(Feather.Worker, [arg1, arg2, arg3]),
     ]
