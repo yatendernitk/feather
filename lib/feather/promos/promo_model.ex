@@ -29,39 +29,50 @@ defmodule Feather.PromoModel do
     timestamps()
   end
 
+  @doc """
+  module to give code details list by limit & offset
+  """
   def get_codes(params) do
-    limit = params["limit"] || 20
-    offset = params["offset"] || 0
-    sort_by = params["sort_by"] || "id"
-    order = params["order"] || "asc"
+    limit = params["limit"] || "20"
+    offset = params["offset"] || "0"
+    # sort_by = params["sort_by"] || "id"
+    # order = params["order"] || "asc"
     type = params["type"] || true
 
     query = (
-      from p in PostModel,
-      limit: limit,
-      offset: offset,
+      from p in PromoModel,
+      limit: ^String.to_integer(limit),
+      offset: ^String.to_integer(offset),
       where: p.is_active == ^type,
-      order_by: [{:"#{order}", :"#{sort_by}"}],
+      # order_by: [{:"#{order}", :"#{sort_by}"}],
       select: p
     )
-    query
-    |> Repo.all()
-    |> Enum.to_list
-    |> Enum.map(fn x->
-      x |> Feather.PromoUtils.pack_code_json
-    end)
+
+    resp =
+      query
+      |> Repo.all()
+      |> Enum.map(fn x->
+        x |> Feather.PromoUtils.pack_code_json
+      end)
+    {:ok, resp}
   end
 
+  @doc """
+  give code details when u pass code
+  """
   def get_code_details(params) do
     code = params["code"]
     query =
       from u in PromoModel,
       where: u.code == ^code,
-      select: u.event_location.coordinates
+      select: u
 
+    resp =
       query
-      |> Repo.one!()
+      |> Repo.one()
       |> PromoUtils.pack_code_json()
+
+    {:ok, resp}
   end
 
    @doc """
@@ -72,6 +83,30 @@ defmodule Feather.PromoModel do
     |> cast(params, [:code, :description, :is_active, :type, :amount, :event_location, :expire_time, :activation_time, :radius])
     |> validate_required([:code, :description, :is_active, :type, :amount, :event_location, :expire_time, :activation_time, :radius])
   end
+
+  def activate_code(code) do
+    update_code_status(code, true)
+  end
+
+  def deactivate_code(code) do
+    update_code_status(code, false)
+  end
+
+  def update_code_status(code, status) do
+    query =
+        from(
+          p in PromoModel,
+          where: p.code == ^code,
+          update: [set: [is_active: ^status]]
+        )
+    case Repo.update_all(query, []) do
+      {1, _} -> {:ok, "success"}
+      {0, _} -> {:error, "invalid code"}
+      _ -> {:error, "some error occured, please try again"}
+    end
+  end
+
+
 
   @doc """
   module to give back code if our source or destination falls inside the radius
@@ -135,13 +170,12 @@ defmodule Feather.PromoModel do
     {:ok, "all is well code generated"}
   end
 
-
-  defp get_promo_code_list(total_promo_num) do
+  defp get_promo_code_list(total_promo_num), do:
     total_promo_num
     |> AppUtils.generate_promos
-  end
 
   defp extract_lat_long(params), do:
     LocationUtils.extract_lat_long(params)
+
 
 end

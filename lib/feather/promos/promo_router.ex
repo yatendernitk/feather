@@ -11,7 +11,7 @@ defmodule Feather.PromoRouter do
   get "/:code", PromoController, :get_code_details
   post "/", PromoController, :create
   post "/:code/validate", PromoController, :validate_code
-  put "/", PromoController, :activate_code
-  delete "/", PromoController, :deactivate_code
+  put "/:code", PromoController, :activate_code
+  delete "/:code", PromoController, :deactivate_code
 
 end
