@@ -106,7 +106,10 @@ defmodule Feather.PromoModel do
     end
   end
 
-
+  #todo validate code with coordinates
+  def validate_code(_params) do
+    {:ok, "valid"}
+  end
 
   @doc """
   module to give back code if our source or destination falls inside the radius
