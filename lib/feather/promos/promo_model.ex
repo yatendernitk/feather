@@ -8,7 +8,8 @@ defmodule Feather.PromoModel do
     Repo,
     PromoModel,
     AppUtils,
-    LocationUtils
+    LocationUtils,
+    PromoUtils
   }
 
   @offer_days 15
@@ -26,6 +27,41 @@ defmodule Feather.PromoModel do
     field :activation_time, Timex.Ecto.DateTime, default: Timex.now
     field :radius, :decimal
     timestamps()
+  end
+
+  def get_codes(params) do
+    limit = params["limit"] || 20
+    offset = params["offset"] || 0
+    sort_by = params["sort_by"] || "id"
+    order = params["order"] || "asc"
+    type = params["type"] || true
+
+    query = (
+      from p in PostModel,
+      limit: limit,
+      offset: offset,
+      where: p.is_active == ^type,
+      order_by: [{:"#{order}", :"#{sort_by}"}],
+      select: p
+    )
+    query
+    |> Repo.all()
+    |> Enum.to_list
+    |> Enum.map(fn x->
+      x |> Feather.PromoUtils.pack_code_json
+    end)
+  end
+
+  def get_code_details(params) do
+    code = params["code"]
+    query =
+      from u in PromoModel,
+      where: u.code == ^code,
+      select: u.event_location.coordinates
+
+      query
+      |> Repo.one!()
+      |> PromoUtils.pack_code_json()
   end
 
    @doc """
@@ -96,6 +132,7 @@ defmodule Feather.PromoModel do
       Feather.PromoModel.changeset(%Feather.PromoModel{}, promo_code_item)
         |> Feather.Repo.insert!()
     end)
+    {:ok, "all is well code generated"}
   end
 
 
