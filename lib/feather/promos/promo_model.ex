@@ -60,12 +60,7 @@ defmodule Feather.PromoModel do
   @doc """
   give code details when u pass code
   """
-  def get_code_details(nil), do: {:error, "invalid code"}
-
-  def get_code_details(""), do: {:error, "invalid code"}
-
-  def get_code_details(params) do
-    code = params["code"]
+  def get_code_details(%{"code"=> code}) do
     query =
       from u in PromoModel,
       where: u.code == ^code,
@@ -77,6 +72,23 @@ defmodule Feather.PromoModel do
       |> PromoUtils.pack_code_json()
 
     {:ok, resp}
+  end
+
+
+  def get_valid_code_details(code) do
+    query =
+      from u in PromoModel,
+      where: u.code == ^code and u.is_active == true and u.expire_time > ^Timex.now(),
+      select: u
+
+    resp =
+      query
+      |> Repo.one()
+
+    case resp do
+      nil -> {:error, nil}
+      _ -> {:ok, resp |> PromoUtils.pack_code_json()}
+    end
   end
 
    @doc """
@@ -112,14 +124,22 @@ defmodule Feather.PromoModel do
 
   end
 
+  def get_data do
+    %{
+      "code"=> "BAF0CEC8",
+      "radius"=> 50,
+      "source"=> %{"lat"=> 27.8974, "long"=> 78.088},
+      "destination"=> %{"lat"=> 28.4070, "long"=> 77.8498}
+    }
+  end
   #todo validate code with coordinates
   def validate_code(params) do
     code = params["code"]
-      case resp = code |> get_code_details do
+      case resp = code |> get_valid_code_details do
         {:ok, code_details} ->
           radius = code_details["radius"]
-          validate_source_task = Task.async(params["source"] |> within(radius, code))
-          validate_destination_task = Task.async(params["destination"] |> within(radius, code))
+          validate_source_task = Task.async(fn -> params["source"] |> within(radius, code) end)
+          validate_destination_task = Task.async(fn -> params["destination"] |> within(radius, code) end)
 
           case {Task.await(validate_source_task), Task.await(validate_destination_task)} do
             {true, true} -> {:ok, "valid code for source & destination"}
@@ -128,23 +148,29 @@ defmodule Feather.PromoModel do
             {false, false} -> {:error, "pickup and drop outside of event area"}
             {_, _} -> {:error, "unknown error please try again"}
           end
+          {:error, _} ->
+            {:error, "invalid code"}
           _ ->
-            resp
+            {:error, resp}
       end
   end
 
   @doc """
   module to give back code if our source or destination falls inside the radius
   """
-  def within(%{long: longitude, lat: latitude}, radius, code) do
+  def within(%{"long"=> longitude, "lat"=> latitude}, radius, code) do
     event_coordinates = %Geo.Point{coordinates: {longitude, latitude}}
-    radius = radius * 1000
+    radius = Decimal.mult(radius, Decimal.new(1000)) |> Decimal.to_float
     query =
       from p in PromoModel,
       where: fragment("st_distance_sphere(?, ?)  < ?", p.event_location, ^event_coordinates, ^radius)
-      and p.code == ^code and p.is_active == ^true,
+      and p.code == ^code and p.is_active == ^true and p.expire_time > ^Timex.now(),
       select: count(p.code)
-    Repo.one(query)
+    case Repo.one(query) do
+      0 -> false
+      nil -> false
+      _ -> true
+    end
   end
 
   def get_params() do
