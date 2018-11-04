@@ -12,8 +12,9 @@ config :logger, level: :warn
 # Configure your database
 config :feather, Feather.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
+  username: "ok",
+  password: "maxx",
   database: "feather_test",
   hostname: "localhost",
-  pool: Ecto.Adapters.SQL.Sandbox
+  pool: Ecto.Adapters.SQL.Sandbox,
+  types: Feather.PostgresTypes

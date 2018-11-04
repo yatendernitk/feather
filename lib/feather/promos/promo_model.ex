@@ -40,8 +40,8 @@ defmodule Feather.PromoModel do
 
     query = (
       from p in PromoModel,
-      limit: ^String.to_integer(limit),
-      offset: ^String.to_integer(offset),
+      limit: ^AppUtils.convert_to_int(limit),
+      offset: ^AppUtils.convert_to_int(offset),
       where: p.is_active == ^type,
       select: p
     )
