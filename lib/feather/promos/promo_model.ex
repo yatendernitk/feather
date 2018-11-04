@@ -60,6 +60,10 @@ defmodule Feather.PromoModel do
   @doc """
   give code details when u pass code
   """
+  def get_code_details(nil), do: {:error, "invalid code"}
+
+  def get_code_details(""), do: {:error, "invalid code"}
+
   def get_code_details(params) do
     code = params["code"]
     query =
@@ -94,21 +98,39 @@ defmodule Feather.PromoModel do
 
   def update_code_status(code, status) do
     query =
-        from(
-          p in PromoModel,
-          where: p.code == ^code,
-          update: [set: [is_active: ^status]]
-        )
+      from(
+        p in PromoModel,
+        where: p.code == ^code,
+        update: [set: [is_active: ^status]]
+      )
+
     case Repo.update_all(query, []) do
       {1, _} -> {:ok, "success"}
       {0, _} -> {:error, "invalid code"}
       _ -> {:error, "some error occured, please try again"}
     end
+
   end
 
   #todo validate code with coordinates
-  def validate_code(_params) do
-    {:ok, "valid"}
+  def validate_code(params) do
+    code = params["code"]
+      case resp = code |> get_code_details do
+        {:ok, code_details} ->
+          radius = code_details["radius"]
+          validate_source_task = Task.async(params["source"] |> within(radius, code))
+          validate_destination_task = Task.async(params["destination"] |> within(radius, code))
+
+          case {Task.await(validate_source_task), Task.await(validate_destination_task)} do
+            {true, true} -> {:ok, "valid code for source & destination"}
+            {true , false} -> {:error, "dropping location outside of event area"}
+            {false, true} -> {:error, "pickup outside of event area"}
+            {false, false} -> {:error, "pickup and drop outside of event area"}
+            {_, _} -> {:error, "unknown error please try again"}
+          end
+          _ ->
+            resp
+      end
   end
 
   @doc """
