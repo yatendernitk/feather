@@ -12,6 +12,7 @@ defmodule Feather.PromoModel do
     PromoUtils
   }
 
+  #assuming offer is valid for 15 days it can be configured
   @offer_days 15
 
   @primary_key {:id, :id, autogenerate: true}
@@ -35,8 +36,6 @@ defmodule Feather.PromoModel do
   def get_codes(params) do
     limit = params["limit"] || "20"
     offset = params["offset"] || "0"
-    # sort_by = params["sort_by"] || "id"
-    # order = params["order"] || "asc"
     type = params["type"] || true
 
     query = (
@@ -44,7 +43,6 @@ defmodule Feather.PromoModel do
       limit: ^String.to_integer(limit),
       offset: ^String.to_integer(offset),
       where: p.is_active == ^type,
-      # order_by: [{:"#{order}", :"#{sort_by}"}],
       select: p
     )
 
@@ -58,7 +56,9 @@ defmodule Feather.PromoModel do
   end
 
   @doc """
-  give code details when u pass code
+    give code details when u pass code
+    input -> %{"code"=> code}
+    output -> %{:ok, resp} || {:error, nil}
   """
   def get_code_details(%{"code"=> code}) do
     query =
@@ -71,10 +71,19 @@ defmodule Feather.PromoModel do
       |> Repo.one()
       |> PromoUtils.pack_code_json()
 
-    {:ok, resp}
+    case resp do
+      nil -> {:error, nil}
+      "" -> {:error, "code invalid"}
+      _ -> {:ok, resp}
+    end
   end
 
 
+  @doc """
+    give active & valid non expired code details when u pass code
+    input -> code
+    output -> {:ok, resp} || {:error, nil}
+  """
   def get_valid_code_details(code) do
     query =
       from u in PromoModel,
@@ -100,19 +109,29 @@ defmodule Feather.PromoModel do
     |> validate_required([:code, :description, :is_active, :type, :amount, :event_location, :expire_time, :activation_time, :radius])
   end
 
-  def activate_code(code) do
-    update_code_status(code, true)
+   @doc """
+    activate_code if it is deactivated
+    input -> id
+    output -> {:ok, resp} || {:error, resp}
+  """
+  def activate_code(id) do
+    update_code_status(id, true)
   end
 
-  def deactivate_code(code) do
-    update_code_status(code, false)
+  @doc """
+    deactivate_code if it is active
+    input -> id
+    output -> {:ok, resp} || {:error, resp}
+  """
+  def deactivate_code(id) do
+    update_code_status(id, false)
   end
 
-  def update_code_status(code, status) do
+  def update_code_status(id, status) do
     query =
       from(
         p in PromoModel,
-        where: p.code == ^code,
+        where: p.id == ^id,
         update: [set: [is_active: ^status]]
       )
 
@@ -132,7 +151,18 @@ defmodule Feather.PromoModel do
       "destination"=> %{"lat"=> 28.4070, "long"=> 77.8498}
     }
   end
-  #todo validate code with coordinates
+
+  @doc """
+    validate code for source & destination
+    input:
+    %{
+        "code"=> "BAF0CEC8",
+        "radius"=> 50,
+        "source"=> %{"lat"=> 27.8974, "long"=> 78.088},
+        "destination"=> %{"lat"=> 28.4070, "long"=> 77.8498}
+      }
+    output: {:ok, response} || {:error, response}
+  """
   def validate_code(params) do
     code = params["code"]
       case resp = code |> get_valid_code_details do
@@ -173,6 +203,7 @@ defmodule Feather.PromoModel do
     end
   end
 
+  #sample data
   def get_params() do
     %{
       "radius"=> 50,
@@ -184,6 +215,9 @@ defmodule Feather.PromoModel do
     }
   end
 
+  @doc """
+  generate codes in DB for your promotion
+  """
   def generate_codes(params) do
     radius = params["radius"]
     total_promo_num = params["promo_num"] || 1000
@@ -193,7 +227,6 @@ defmodule Feather.PromoModel do
     expire_time = Timex.shift(activation_time, days: @offer_days)
     {long , lat} = extract_lat_long(params["event_location"])
     event_loc = %Geo.Point{coordinates: {long, lat}, srid: 4326}
-
     promo_code_list = total_promo_num |> get_promo_code_list
 
     promo_code_list
@@ -205,7 +238,7 @@ defmodule Feather.PromoModel do
           is_active: true,
           type: "unique",
           amount: 0.0,
-          event_id: 1234,
+          event_id: nil,
           event_location: event_loc,
           radius: radius,
           expire_time: expire_time,
@@ -216,9 +249,9 @@ defmodule Feather.PromoModel do
     |> Enum.map(fn x ->
       promo_code_item = Task.await(x)
       Feather.PromoModel.changeset(%Feather.PromoModel{}, promo_code_item)
-        |> Feather.Repo.insert!()
+      |> Feather.Repo.insert!()
     end)
-    {:ok, "all is well code generated"}
+    {:ok, "all is well, codes generated"}
   end
 
   defp get_promo_code_list(total_promo_num), do:

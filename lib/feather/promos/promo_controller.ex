@@ -54,9 +54,9 @@ defmodule Feather.PromoController do
   end
 
   def activate_code(conn, params) do
-    code = params["code"]
+    id = params["id"]
     {status, response} =
-      case PromoModel.activate_code(code) do
+      case PromoModel.activate_code(id) do
         {:ok, resp} -> {200, resp}
         {:error, error} -> {400, error}
       end
@@ -66,10 +66,10 @@ defmodule Feather.PromoController do
   end
 
   def deactivate_code(conn, params) do
-    code = params["code"]
+    id = params["id"]
 
     {status, response} =
-      case PromoModel.deactivate_code(code) do
+      case PromoModel.deactivate_code(id) do
         {:ok, resp} -> {200, resp}
         {:error, error} -> {400, error}
       end
