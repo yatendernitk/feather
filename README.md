@@ -16,6 +16,12 @@ Checkout wiki page in github for information about how to use APIs
 
 Ready to run in production? Please [check our deployment guides](http://www.phoenixframework.org/docs/deployment).
 
+
+* To run this project in production env
+ - Create a new file prod.secret.exs in config folder and give configuration of database like i have given in dev.exs then create db in prod and run the project with.
+
+`MIX_ENV=prod iex -S mix phx.server`
+
 ## Learn more
 
   * for any query you can email me at yatener[dot]nitk[at]outlook[dot]com
