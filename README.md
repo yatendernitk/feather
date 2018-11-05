@@ -24,7 +24,7 @@ Ready to run in production? Please [check our deployment guides](http://www.phoe
 
 ## Learn more
 
-  * for any query you can email me at yatener[dot]nitk[at]outlook[dot]com
+  * for any query you can email me at `yatener[dot]nitk[at]outlook[dot]com`
   * suggestions are welcome
 
 Thank You
