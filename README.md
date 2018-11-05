@@ -12,8 +12,14 @@ To start your Phoenix server:
   <!-- * Install Node.js dependencies with `cd assets && npm install` -->
   * Start Phoenix endpoint with `iex -S mix phx.server`
 
-checkout wiki for further information that how to use APIs.
+Checkout wiki page in github for information about how to use APIs
 
-suggestions are welcome :)
+Ready to run in production? Please [check our deployment guides](http://www.phoenixframework.org/docs/deployment).
 
-Thank you
+## Learn more
+
+  * for any query you can email me at yatener[dot]nitk[at]outlook[dot]com
+  * suggestions are welcome
+
+Thank You
+Yatender
