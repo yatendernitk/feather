@@ -42,7 +42,7 @@ config :feather, Feather.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: "ok",
   password: "maxx",
-  database: "elixir_drip_dev",
+  database: "feather_dev",
   hostname: "127.0.0.1",
   pool_size: 10,
   types: Feather.PostgresTypes

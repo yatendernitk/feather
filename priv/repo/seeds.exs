@@ -12,3 +12,16 @@
 # item = %{code: "MEERUT", description: "testing code", is_active: true, type: "unique", amount: 101.50, event_location: %Geo.Point{coordinates: {77.7064, 28.9845}, srid: 4326}}
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+params = %{
+  "radius"=> 50,
+  "promo_num"=> 50,
+  "event_location"=> %{
+    "lat"=> 28.2514,
+    "long"=> 77.8539
+  }
+}
+
+Feather.PromoModel.generate_codes(params)
+
+IO.inspect "setup complete"
+

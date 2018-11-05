@@ -62,9 +62,9 @@ defmodule Feather.PromoModel do
   """
   def get_code_details(%{"code"=> code}) do
     query =
-      from u in PromoModel,
+      (from u in PromoModel,
       where: u.code == ^code,
-      select: u
+      select: u)
 
     resp =
       query

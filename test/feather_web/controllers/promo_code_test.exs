@@ -5,11 +5,11 @@ defmodule Feather.PromoControllerTest do
     PromoModel
   }
 
-  # test "generate promo code test" do
-  #   params = PromoModel.get_params()
-  #   resp = params |> PromoModel.generate_codes()
-  #   assert {:ok, "all is well, codes generated"} == resp
-  # end
+  test "generate promo code test" do
+    params = PromoModel.get_params()
+    resp = params |> PromoModel.generate_codes()
+    assert {:ok, "all is well, codes generated"} == resp
+  end
 
   test "get codes by limit offset" do
     params = %{

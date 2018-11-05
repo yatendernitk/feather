@@ -22,9 +22,10 @@ defmodule Feather.PromoController do
 
   def get_code_details(conn, params) do
     {status, response} =
-      case PromoModel.get_code_details(params) do
+      case PromoModel.get_code_details(%{"code"=> params["code"]}) do
         {:ok, resp} -> {200, resp}
-        {:error, resp} -> {400, resp}
+        {:error, nil} -> {400, nil}
+        {:error, _} -> {400, "error, please try again"}
       end
     conn
     |> put_resp_content_type("application/json")

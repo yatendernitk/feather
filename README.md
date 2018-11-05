@@ -1,20 +1,19 @@
 # Feather
 
+To Setup Database
+  * install Postgres and activate PostGIS
+  * update your username & password in config/prod.exs & config/dev.exs
+
 To start your Phoenix server:
 
   * Install dependencies with `mix deps.get`
-  * Create and migrate your database with `mix ecto.create && mix ecto.migrate`
-  * Install Node.js dependencies with `cd assets && npm install`
-  * Start Phoenix endpoint with `mix phx.server`
+  <!-- * Create and migrate your database with `mix ecto.create && mix ecto.migrate` -->
+  * create & setup your db with `mix ecto.setup`
+  <!-- * Install Node.js dependencies with `cd assets && npm install` -->
+  * Start Phoenix endpoint with `iex -S mix phx.server`
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+checkout wiki for further information that how to use APIs.
 
-Ready to run in production? Please [check our deployment guides](http://www.phoenixframework.org/docs/deployment).
+suggestions are welcome :)
 
-## Learn more
-
-  * Official website: http://www.phoenixframework.org/
-  * Guides: http://phoenixframework.org/docs/overview
-  * Docs: https://hexdocs.pm/phoenix
-  * Mailing list: http://groups.google.com/group/phoenix-talk
-  * Source: https://github.com/phoenixframework/phoenix
+Thank you
